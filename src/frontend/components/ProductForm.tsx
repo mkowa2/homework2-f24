@@ -6,7 +6,11 @@ import '../public/ProductForm.css'
 // Implement the ProductFormProps interface.
 // Note that mode can be either "add" or "delete".
 // onProductAdded and onProductDeleted may or may not be necessarily passed to the component.
-interface ProductFormProps {}
+interface ProductFormProps {
+    mode: 'add' | 'delete'; 
+    onProductAdded?: () => void; 
+    onProductDeleted?: () => void;
+}
 
 const ProductForm: React.FC<ProductFormProps> = ({
     mode,
@@ -21,13 +25,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
         e.preventDefault()
         try {
             if (mode === 'add') {
-                // TODO
-                // Call the correct function from the api module (located in components/api.ts) to add a product
-                // and reset the state of the component. The view should go back to the list of products.
+                await addProduct({ name, image_url: imageUrl, deleted:false });
+                setName('');
+                setImageUrl('');
+                if (onProductAdded) {
+                    onProductAdded();  // Call the callback function if provided
+                }
             } else {
-                // TODO
-                // Call the correct function from the api module (located in components/api.ts) to delete a product
-                // and reset the state of the component. The view should go back to the list of products.
+                await deleteProduct(Number(productId));
+                setProductId('');
+                if (onProductDeleted) {
+                  onProductDeleted();  // Call the callback function if provided
+                }
             }
         } catch (error) {
             console.error(
@@ -40,8 +49,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     return (
         <div className="product-form-container">
             <h2 className="product-form-title">
-                {/* TODO Set the correct title based on whether the component is for adding or deleting products.
-          The titles should be "Add New Product" and "Delete Product" respectively. */}
+                {mode === 'add' ? 'Add New Product' : 'Delete Product'}
             </h2>
             <form onSubmit={handleSubmit} className="product-form">
                 {mode === 'add' ? (
@@ -52,6 +60,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                                 type="text"
                                 id="name"
                                 value={name}
+                                onChange={(e) => setName(e.target.value)}
                                 placeholder="Enter product name..."
                                 required
                             />
@@ -62,6 +71,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                                 type="url"
                                 id="imageUrl"
                                 value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
                                 placeholder="Enter image URL..."
                             />
                         </div>
@@ -73,6 +83,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             type="text"
                             id="productId"
                             value={productId}
+                            onChange={(e) => setProductId(e.target.value)}
                             placeholder="Enter product ID..."
                             required
                         />

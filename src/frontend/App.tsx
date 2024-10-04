@@ -13,13 +13,24 @@ function App() {
     // You can understand which variables you need by looking at the code and at the props that the components need.
     // The variable showForm should assume the values "add", "delete", or "none".
     // You're free to either create a type for this or not.
-
+    const [query, setQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showForm, setShowForm] = useState<'add' | 'delete' | 'none'>('none');
+    const [products, setProducts] = useState([]);
+    const [status, setStatus] = useState('');
     useEffect(() => {
         const loadProducts = async () => {
             // TODO
             // Fetch the products using the right function from the api module (located in components/api.ts).
             // After receiving the results, you should set the products and the total number of pages to the respective state variables.
             // If there's an error, set the status state variable to the error message "Failed to load products".
+            try {
+                const response = await fetchProducts(query, currentPage);
+                setProducts(response.products);
+                setStatus('');
+            } catch (error) {
+                setStatus('Failed to load products')
+            }
         }
 
         loadProducts()
@@ -78,7 +89,7 @@ function App() {
                     {' '}
                     {/* TODO Add the necessary props to the underlying components. */}
                     <Search />
-                    <ProductList />
+                    <ProductList products= {products} />
                 </>
             )}
         </div>

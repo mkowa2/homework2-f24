@@ -1,10 +1,17 @@
 import React from 'react'
 import type { Product } from '../types'
 import '../public/ProductList.css'
+import ProductCard from './ProductCard'; 
+
 
 // TODO
 // Implement the ProductListProps interface.
-interface ProductListProps {}
+interface ProductListProps {
+    products  : Product[],
+    currentPage: number,
+    totalPages: number,
+    setCurrentPage: (page: number) => void,
+}
 
 const ProductList: React.FC<ProductListProps> = ({
     products,
@@ -14,12 +21,17 @@ const ProductList: React.FC<ProductListProps> = ({
 }) => {
     const renderPaginationLinks = () => {
         const links = []
-        // TODO
-        // Here you should populate the "links" array with JSX elements for each page number.
-        // Each link is an <a> element with the page number as the text content.
-        // The current page should have the class "active".
-        // Make sure to handle the click event.
-
+        for (let i = 1; i <= totalPages; i++) {
+            links.push(
+              <a
+                key={i}
+                className={i === currentPage ? 'active' : ''}
+                onClick={() => setCurrentPage(i)}
+              >
+                {i}
+              </a>
+            );
+          }
         return links
     }
 
@@ -30,7 +42,9 @@ const ProductList: React.FC<ProductListProps> = ({
                 <p>No products found.</p>
             ) : (
                 <div className="product-grid">
-                    {/* TODO Generate a ProductCard component for each product in the products array. */}
+                    {products.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                ))}
                 </div>
             )}
             <div className="pagination">{renderPaginationLinks()}</div>
